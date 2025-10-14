@@ -42,6 +42,30 @@ document.addEventListener('DOMContentLoaded', function() {
     let autoScrollTriggered = false;
     const firstImage = document.querySelector('.full-image');
 
+    function smoothScrollTo(targetY, duration) {
+        const startY = window.scrollY || window.pageYOffset;
+        const distance = targetY - startY;
+        const startTime = performance.now();
+
+        function animation(currentTime) {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+
+            // Easing function for smooth acceleration/deceleration
+            const easeInOutCubic = progress < 0.5
+                ? 4 * progress * progress * progress
+                : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+            window.scrollTo(0, startY + distance * easeInOutCubic);
+
+            if (progress < 1) {
+                requestAnimationFrame(animation);
+            }
+        }
+
+        requestAnimationFrame(animation);
+    }
+
     function checkAutoScroll() {
         if (autoScrollTriggered || !firstImage) return;
 
@@ -51,10 +75,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Check if user has scrolled past half the height of first image
         if (scrollPosition > firstImageHeight / 2) {
             autoScrollTriggered = true;
-            window.scrollTo({
-                top: document.body.scrollHeight,
-                behavior: 'smooth'
-            });
+            // Scroll to bottom over 2 seconds (2000ms)
+            smoothScrollTo(document.body.scrollHeight, 2000);
         }
     }
 
