@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Get or create a unique user ID
+    // create unique user ID
     function getUserId() {
         let userId = localStorage.getItem('phonefeed_userId');
         if (!userId) {
@@ -75,8 +75,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Check if user has scrolled past half the height of first image
         if (scrollPosition > firstImageHeight / 2) {
             autoScrollTriggered = true;
-            // Scroll to bottom over 2 seconds (2000ms)
-            smoothScrollTo(document.body.scrollHeight, 2000);
+            // Scroll to bottom over 15 seconds (15000ms)
+            smoothScrollTo(document.body.scrollHeight, 15000);
         }
     }
 
