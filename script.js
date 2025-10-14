@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // create unique user ID
     function getUserId() {
         let userId = localStorage.getItem('phonefeed_userId');
@@ -82,6 +82,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
     window.addEventListener('scroll', checkAutoScroll);
 
-    // Keep gradient always visible (no fade animation)
-    // Gradient stays at full opacity at all times
 });
