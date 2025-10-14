@@ -82,49 +82,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     window.addEventListener('scroll', checkAutoScroll);
 
-    // Animated gradient overlay on scroll
-    function handleGradientAnimation() {
-        const imageWrappers = document.querySelectorAll('.image-wrapper');
-        const windowHeight = window.innerHeight;
-
-        imageWrappers.forEach((wrapper) => {
-            const rect = wrapper.getBoundingClientRect();
-            const gradientOverlay = wrapper.querySelector('.gradient-overlay');
-
-            // Calculate how far the image is from the bottom of the viewport
-            // When the bottom of the image is near the bottom of viewport, fade out gradient
-            const distanceFromBottom = windowHeight - rect.bottom;
-            const imageHeight = rect.height;
-
-            // Start fading when the bottom 30% of the image is visible
-            const fadeStartPoint = imageHeight * 0.3;
-
-            if (distanceFromBottom > -fadeStartPoint && rect.top < windowHeight) {
-                // Calculate fade progress (0 to 1)
-                const fadeProgress = Math.min(Math.max((distanceFromBottom + fadeStartPoint) / (fadeStartPoint * 2), 0), 1);
-                gradientOverlay.style.opacity = 1 - fadeProgress;
-            } else if (rect.bottom < windowHeight * 0.5) {
-                // Fully fade out when scrolled past
-                gradientOverlay.style.opacity = 0;
-            } else {
-                // Fully visible when not near viewport bottom
-                gradientOverlay.style.opacity = 1;
-            }
-        });
-    }
-
-    // Run on scroll with throttling for performance
-    let ticking = false;
-    window.addEventListener('scroll', () => {
-        if (!ticking) {
-            window.requestAnimationFrame(() => {
-                handleGradientAnimation();
-                ticking = false;
-            });
-            ticking = true;
-        }
-    });
-
-    // Run once on load
-    handleGradientAnimation();
+    // Keep gradient always visible (no fade animation)
+    // Gradient stays at full opacity at all times
 });
