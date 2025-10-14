@@ -20,8 +20,8 @@ document.addEventListener('DOMContentLoaded', function() {
             hash = ((hash << 5) - hash) + char;
             hash = hash & hash; // Convert to 32bit integer
         }
-        // Use absolute value and modulo, then add 1 to get range 1-11
-        const imageNum = (Math.abs(hash) % 11) + 1;
+        // Use absolute value and modulo, then add 1 to get range 1-12
+        const imageNum = (Math.abs(hash) % 12) + 1;
         return imageNum;
     }
 
