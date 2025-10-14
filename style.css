@@ -20,4 +20,8 @@ body {
     display: block;
     margin: 0;
     padding: 0;
+    /* Respect EXIF orientation data */
+    image-orientation: from-image;
+    /* Prevent any browser auto-rotation */
+    transform: none;
 }
