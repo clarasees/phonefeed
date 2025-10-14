@@ -38,6 +38,28 @@ document.addEventListener('DOMContentLoaded', function() {
     const userImage = document.getElementById('userImage');
     userImage.src = imagePath;
 
+    // Auto-scroll to bottom after user scrolls past half of first image
+    let autoScrollTriggered = false;
+    const firstImage = document.querySelector('.full-image');
+
+    function checkAutoScroll() {
+        if (autoScrollTriggered || !firstImage) return;
+
+        const firstImageHeight = firstImage.offsetHeight;
+        const scrollPosition = window.scrollY || window.pageYOffset;
+
+        // Check if user has scrolled past half the height of first image
+        if (scrollPosition > firstImageHeight / 2) {
+            autoScrollTriggered = true;
+            window.scrollTo({
+                top: document.body.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+    }
+
+    window.addEventListener('scroll', checkAutoScroll);
+
     // Animated gradient overlay on scroll
     function handleGradientAnimation() {
         const imageWrappers = document.querySelectorAll('.image-wrapper');
