@@ -12,23 +12,21 @@ document.addEventListener('DOMContentLoaded', function () {
         return userId;
     }
 
-    // Get or assign user number (first 12 users get sequential numbers)
+    // Get or assign user number (all users get sequential numbers cycling 1-12)
     function getUserNumber() {
         let userNumber = localStorage.getItem('phonefeed_userNumber');
 
         if (!userNumber) {
-            // Get list of all assigned user numbers from localStorage
-            let assignedNumbers = JSON.parse(localStorage.getItem('phonefeed_assignedNumbers') || '[]');
+            // Get the current user count from localStorage
+            let userCount = parseInt(localStorage.getItem('phonefeed_userCount') || '0');
 
-            // If we have less than 12 users, assign the next sequential number
-            if (assignedNumbers.length < 12) {
-                userNumber = assignedNumbers.length + 1;
-                assignedNumbers.push(userNumber);
-                localStorage.setItem('phonefeed_assignedNumbers', JSON.stringify(assignedNumbers));
-            } else {
-                // After 12 users, assign a random number between 1-12
-                userNumber = Math.floor(Math.random() * 12) + 1;
-            }
+            // Increment the user count for this new user
+            userCount++;
+            localStorage.setItem('phonefeed_userCount', userCount.toString());
+
+            // Assign image number based on user count (cycles through 1-12)
+            // User 1 gets image 1, user 2 gets image 2, ..., user 13 gets image 1, etc.
+            userNumber = ((userCount - 1) % 12) + 1;
 
             localStorage.setItem('phonefeed_userNumber', userNumber.toString());
         } else {
