@@ -12,22 +12,35 @@ document.addEventListener('DOMContentLoaded', function () {
         return userId;
     }
 
-    // Improved hash function for better distribution
-    function hashToImageNumber(userId) {
-        let hash = 0;
-        for (let i = 0; i < userId.length; i++) {
-            const char = userId.charCodeAt(i);
-            hash = ((hash << 5) - hash) + char;
-            hash = hash & hash; // Convert to 32bit integer
+    // Get or assign user number (first 12 users get sequential numbers)
+    function getUserNumber() {
+        let userNumber = localStorage.getItem('phonefeed_userNumber');
+
+        if (!userNumber) {
+            // Get list of all assigned user numbers from localStorage
+            let assignedNumbers = JSON.parse(localStorage.getItem('phonefeed_assignedNumbers') || '[]');
+
+            // If we have less than 12 users, assign the next sequential number
+            if (assignedNumbers.length < 12) {
+                userNumber = assignedNumbers.length + 1;
+                assignedNumbers.push(userNumber);
+                localStorage.setItem('phonefeed_assignedNumbers', JSON.stringify(assignedNumbers));
+            } else {
+                // After 12 users, assign a random number between 1-12
+                userNumber = Math.floor(Math.random() * 12) + 1;
+            }
+
+            localStorage.setItem('phonefeed_userNumber', userNumber.toString());
+        } else {
+            userNumber = parseInt(userNumber);
         }
-        // Use absolute value and modulo, then add 1 to get range 1-12
-        const imageNum = (Math.abs(hash) % 12) + 1;
-        return imageNum;
+
+        return userNumber;
     }
 
     // Get user ID and assigned image number
     const userId = getUserId();
-    const imageNumber = hashToImageNumber(userId);
+    const imageNumber = getUserNumber();
     const imagePath = `png/${imageNumber}.png`;
 
     console.log('User ID:', userId);
