@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Sequential Image Assignment</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 32px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .reset-btn {
+            background-color: #f44336;
+        }
+        .reset-btn:hover {
+            background-color: #da190b;
+        }
+        #results {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+        }
+        .user-entry {
+            padding: 10px;
+            margin: 5px 0;
+            background-color: white;
+            border-left: 4px solid #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Sequential Image Assignment</h1>
+    <p>This will simulate multiple users visiting your site and show which image each user gets.</p>
+
+    <button onclick="simulateNewUser()">Simulate New User</button>
+    <button onclick="simulateMultipleUsers()">Simulate 15 Users</button>
+    <button class="reset-btn" onclick="resetAll()">Reset All Data</button>
+
+    <div id="results">
+        <h3>Current Status:</h3>
+        <p><strong>Total Users:</strong> <span id="userCount">0</span></p>
+        <p><strong>Your User Number:</strong> <span id="yourNumber">N/A</span></p>
+        <p><strong>Your Image:</strong> <span id="yourImage">N/A</span></p>
+    </div>
+
+    <div id="allUsers">
+        <h3>All Simulated Users:</h3>
+    </div>
+
+    <script>
+        // Copy of the function from your script.js
+        function getUserNumber() {
+            let userNumber = localStorage.getItem('phonefeed_userNumber');
+
+            if (!userNumber) {
+                // Get the current user count from localStorage
+                let userCount = parseInt(localStorage.getItem('phonefeed_userCount') || '0');
+
+                // Increment the user count for this new user
+                userCount++;
+                localStorage.setItem('phonefeed_userCount', userCount.toString());
+
+                // Assign image number based on user count (cycles through 1-12)
+                userNumber = ((userCount - 1) % 12) + 1;
+
+                localStorage.setItem('phonefeed_userNumber', userNumber.toString());
+            } else {
+                userNumber = parseInt(userNumber);
+            }
+
+            return userNumber;
+        }
+
+        function updateDisplay() {
+            const userCount = localStorage.getItem('phonefeed_userCount') || '0';
+            const userNumber = localStorage.getItem('phonefeed_userNumber') || 'N/A';
+            const imageNumber = userNumber !== 'N/A' ? userNumber : 'N/A';
+
+            document.getElementById('userCount').textContent = userCount;
+            document.getElementById('yourNumber').textContent = userNumber;
+            document.getElementById('yourImage').textContent = imageNumber !== 'N/A' ? `png/${imageNumber}.png` : 'N/A';
+        }
+
+        function simulateNewUser() {
+            // Clear only the user number to simulate a new user
+            localStorage.removeItem('phonefeed_userNumber');
+            const imageNumber = getUserNumber();
+            const userCount = localStorage.getItem('phonefeed_userCount');
+
+            addUserToList(userCount, imageNumber);
+            updateDisplay();
+        }
+
+        function simulateMultipleUsers() {
+            for (let i = 0; i < 15; i++) {
+                localStorage.removeItem('phonefeed_userNumber');
+                const imageNumber = getUserNumber();
+                const userCount = localStorage.getItem('phonefeed_userCount');
+                addUserToList(userCount, imageNumber);
+            }
+            updateDisplay();
+        }
+
+        function addUserToList(userNum, imageNum) {
+            const allUsersDiv = document.getElementById('allUsers');
+            const entry = document.createElement('div');
+            entry.className = 'user-entry';
+            entry.innerHTML = `<strong>User ${userNum}:</strong> Assigned image <strong>${imageNum}.png</strong>`;
+            allUsersDiv.appendChild(entry);
+        }
+
+        function resetAll() {
+            localStorage.removeItem('phonefeed_userCount');
+            localStorage.removeItem('phonefeed_userNumber');
+            document.getElementById('allUsers').innerHTML = '<h3>All Simulated Users:</h3>';
+            updateDisplay();
+            alert('All data reset! You can now start fresh.');
+        }
+
+        // Initialize display on load
+        updateDisplay();
+    </script>
+</body>
+</html>

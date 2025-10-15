@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Reset Users</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 100px auto;
+            padding: 20px;
+            text-align: center;
+        }
+        .stats {
+            background-color: #f0f0f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .stats p {
+            margin: 10px 0;
+            font-size: 18px;
+        }
+        button {
+            background-color: #f44336;
+            color: white;
+            padding: 15px 32px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover {
+            background-color: #da190b;
+        }
+        .refresh-btn {
+            background-color: #2196F3;
+        }
+        .refresh-btn:hover {
+            background-color: #0b7dda;
+        }
+        .success {
+            color: #4CAF50;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>User Management</h1>
+
+    <div class="stats">
+        <h2>Current Stats</h2>
+        <p><strong>Total Users:</strong> <span id="userCount">0</span></p>
+        <p><strong>Your User ID:</strong> <span id="userId">N/A</span></p>
+        <p><strong>Your Assigned Image:</strong> <span id="userImage">N/A</span></p>
+    </div>
+
+    <button class="refresh-btn" onclick="refreshStats()">Refresh Stats</button>
+    <button onclick="resetAllUsers()">Reset All Users</button>
+
+    <div id="message"></div>
+
+    <script>
+        function refreshStats() {
+            const userCount = localStorage.getItem('phonefeed_userCount') || '0';
+            const userId = localStorage.getItem('phonefeed_userId') || 'N/A';
+            const userNumber = localStorage.getItem('phonefeed_userNumber') || 'N/A';
+
+            document.getElementById('userCount').textContent = userCount;
+            document.getElementById('userId').textContent = userId;
+            document.getElementById('userImage').textContent = userNumber !== 'N/A' ? `png/${userNumber}.png` : 'N/A';
+        }
+
+        function resetAllUsers() {
+            if (confirm('Are you sure you want to reset all users? This will:\n\n- Clear the user counter\n- Remove all user assignments\n- Start fresh from User 1\n\nThis cannot be undone!')) {
+                // Clear all phonefeed localStorage items
+                localStorage.removeItem('phonefeed_userCount');
+                localStorage.removeItem('phonefeed_userNumber');
+                localStorage.removeItem('phonefeed_userId');
+
+                // Show success message
+                const messageDiv = document.getElementById('message');
+                messageDiv.innerHTML = '<p class="success">✓ All users have been reset! Counter is back to 0.</p>';
+
+                // Refresh the display
+                refreshStats();
+
+                // Clear success message after 3 seconds
+                setTimeout(() => {
+                    messageDiv.innerHTML = '';
+                }, 3000);
+            }
+        }
+
+        // Load stats on page load
+        refreshStats();
+    </script>
+</body>
+</html>

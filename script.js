@@ -1,12 +1,11 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // create unique user ID
+    // create unique user ID based on user count
     function getUserId() {
         let userId = localStorage.getItem('phonefeed_userId');
         if (!userId) {
-            // Generate a unique ID with better randomness
-            const randomPart = Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2);
-            const timePart = Date.now().toString(36);
-            userId = timePart + '-' + randomPart;
+            // Get the current user count to create a simple, sequential user ID
+            let userCount = parseInt(localStorage.getItem('phonefeed_userCount') || '0') + 1;
+            userId = 'user-' + userCount;
             localStorage.setItem('phonefeed_userId', userId);
         }
         return userId;
