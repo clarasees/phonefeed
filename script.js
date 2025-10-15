@@ -1,43 +1,77 @@
-document.addEventListener('DOMContentLoaded', function () {
-    // create unique user ID based on user count
-    function getUserId() {
+document.addEventListener('DOMContentLoaded', async function () {
+    // Firebase-based user assignment
+    async function assignUserFromFirebase() {
+        // Check if user already exists in localStorage
         let userId = localStorage.getItem('phonefeed_userId');
-        if (!userId) {
-            // Get the current user count to create a simple, sequential user ID
-            let userCount = parseInt(localStorage.getItem('phonefeed_userCount') || '0') + 1;
-            userId = 'user-' + userCount;
-            localStorage.setItem('phonefeed_userId', userId);
-        }
-        return userId;
-    }
-
-    // Get or assign user number (all users get sequential numbers cycling 1-12)
-    function getUserNumber() {
         let userNumber = localStorage.getItem('phonefeed_userNumber');
 
-        if (!userNumber) {
-            // Get the current user count from localStorage
-            let userCount = parseInt(localStorage.getItem('phonefeed_userCount') || '0');
-
-            // Increment the user count for this new user
-            userCount++;
-            localStorage.setItem('phonefeed_userCount', userCount.toString());
-
-            // Assign image number based on user count (cycles through 1-12)
-            // User 1 gets image 1, user 2 gets image 2, ..., user 13 gets image 1, etc.
-            userNumber = ((userCount - 1) % 12) + 1;
-
-            localStorage.setItem('phonefeed_userNumber', userNumber.toString());
-        } else {
-            userNumber = parseInt(userNumber);
+        if (userId && userNumber) {
+            return {
+                userId: userId,
+                userNumber: parseInt(userNumber)
+            };
         }
 
-        return userNumber;
+        // New user - get assignment from Firebase
+        try {
+            const counterRef = db.collection('counters').doc('userCounter');
+
+            // Use Firestore transaction to atomically increment the counter
+            const result = await db.runTransaction(async (transaction) => {
+                const counterDoc = await transaction.get(counterRef);
+
+                let newCount;
+                if (!counterDoc.exists) {
+                    // Initialize counter if it doesn't exist
+                    newCount = 1;
+                    transaction.set(counterRef, { count: newCount });
+                } else {
+                    // Increment the counter
+                    newCount = counterDoc.data().count + 1;
+                    transaction.update(counterRef, { count: newCount });
+                }
+
+                // Calculate image number (cycles through 1-12)
+                const imageNumber = ((newCount - 1) % 12) + 1;
+
+                return {
+                    userId: 'user-' + newCount,
+                    userNumber: imageNumber,
+                    totalCount: newCount
+                };
+            });
+
+            // Save to localStorage for future visits
+            localStorage.setItem('phonefeed_userId', result.userId);
+            localStorage.setItem('phonefeed_userNumber', result.userNumber.toString());
+
+            console.log('New user assigned from Firebase:', result);
+            return result;
+
+        } catch (error) {
+            console.error('Error assigning user from Firebase:', error);
+
+            // Fallback to localStorage if Firebase fails
+            console.log('Falling back to localStorage');
+            let userCount = parseInt(localStorage.getItem('phonefeed_userCount') || '0') + 1;
+            let fallbackUserId = 'user-' + userCount;
+            let fallbackUserNumber = ((userCount - 1) % 12) + 1;
+
+            localStorage.setItem('phonefeed_userId', fallbackUserId);
+            localStorage.setItem('phonefeed_userNumber', fallbackUserNumber.toString());
+            localStorage.setItem('phonefeed_userCount', userCount.toString());
+
+            return {
+                userId: fallbackUserId,
+                userNumber: fallbackUserNumber
+            };
+        }
     }
 
-    // Get user ID and assigned image number
-    const userId = getUserId();
-    const imageNumber = getUserNumber();
+    // Get user assignment
+    const userAssignment = await assignUserFromFirebase();
+    const userId = userAssignment.userId;
+    const imageNumber = userAssignment.userNumber;
     const imagePath = `png/${imageNumber}.png`;
 
     console.log('User ID:', userId);
